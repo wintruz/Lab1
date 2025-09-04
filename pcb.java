@@ -19,4 +19,7 @@ public class pcb {
 
     //Constructor
     
+    public pcb(){
+        
+    }
 }
