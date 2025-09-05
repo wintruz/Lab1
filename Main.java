@@ -13,7 +13,8 @@ public class Main {
 
         for(int i = 0; i < num_procesos; i++){
             bloqueo = (genNumRandom(0, 1) == 1); // Asignacion de true en caso de que el valor dado sea 1, false en caso contrario
-            // Habria que crear variables para cada atributo y despues pasarlo al constructor
+            // Habria que crear variables para cada atributo y despues pasarlo al constructor. El unico atributo que no hay que crearle variable
+            // es al estado, ya que se le asignara 'N' por defecto
             proceso = new pcb();
         }
     }

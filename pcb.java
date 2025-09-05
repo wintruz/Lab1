@@ -24,7 +24,7 @@ public class pcb {
     public pcb(String id, int cInstr, boolean bloq, int tCola, int tCDC, int tBloq, int tEjec){
         this.id_PCB = id;
         this.cant_Instruc = cInstr;
-        this.estado = 'N';
+        this.estado = 'N'; // Unico atributo que se le asigna un valor por defecto
         this.bloqueo = bloq;
         this.tiempo_Cola = tCola;
         this.tiempo_CDC = tCDC;
