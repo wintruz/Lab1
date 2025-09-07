@@ -51,6 +51,9 @@ public class PCBP {
 	public void setCantidadInstrucciones(int cantidad){
 		this.cantidadInstrucciones = cantidad;
 	}
+
+    // El valor actual del objeto se le suma con el argumento, asegurase que 
+    // su argumento sea una suma del valor actual y el valor agregado
     public void setTiempoCola(int tiempoCola) { this.tiempoCola = tiempoCola; }
     public void setTiempoBloqueo(int tiempoBloqueo) { this.tiempoBloqueo = tiempoBloqueo; }
     public void setTiempoEjecucion(int tiempoEjecucion) { this.tiempoEjecucion = tiempoEjecucion; }
