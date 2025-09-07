@@ -76,8 +76,7 @@ public class Main {
 								p.setTiempoTotal(1);
 						}
 					}
-				} else {
-						primeraIteracion = false; // Después de la primera iteración, ya no será true
+					primeraIteracion = false; // Después de la primera iteración, ya no será true
 				}
 
 			// Evaluacion del proceso actual
@@ -97,15 +96,19 @@ public class Main {
 				procesoActual.setTiempoEjecucion(procesoActual.getCantidadInstrucciones());
 			}
 
+			// Tiempo total
+			if(procesoActual.getCantidadInstrucciones() <= quantum) {
+				procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + procesoActual.getTiempoEjecucion());
+			} else {
+				procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + quantum);
+			}
+
 			// Cantidad de instrucciones
 			if((procesoActual.getCantidadInstrucciones() - quantum) >= 0){ // Evita numeros negativos
 				procesoActual.setCantidadInstrucciones(procesoActual.getCantidadInstrucciones() - quantum);
 			} else {
 				procesoActual.setCantidadInstrucciones(0);
 			}
-
-			// Tiempo total
-			procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + procesoActual.getTiempoEjecucion());
 
 			// Inicio de salida de tabla #1 (Proceso en ejecucion)
 			System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
