@@ -5,7 +5,7 @@ public class PCBP {
     protected int cantidadInstrucciones;
     protected boolean bloqueo;
     protected String estado; // L, E, B, T
-    
+    protected int cambioContexto = 0;
     protected int tiempoBloqueo = 0;    // ciclos de bloqueo
     protected int tiempoCola = 0;       // tiempo en cola de listos
     protected int tiempoEjecucion = 0;  // tiempo ejecutado
@@ -41,9 +41,16 @@ public class PCBP {
     public int getTiempoBloqueo() { return tiempoBloqueo; }
     public int getTiempoEjecucion() { return tiempoEjecucion; }
     public int getTiempoTotal() { return tiempoTotal; }
+    public int getCambioContexto(){ return cambioContexto;}
 
     // Setters
     public void setEstado(String estado) { this.estado = estado; }
+    public void setCambioContexto(int cantidad){
+        this.cambioContexto += cantidad;
+    }
+	public void setCantidadInstrucciones(int cantidad){
+		this.cantidadInstrucciones = cantidad;
+	}
     public void setTiempoCola(int tiempoCola) { this.tiempoCola = tiempoCola; }
     public void setTiempoBloqueo(int tiempoBloqueo) { this.tiempoBloqueo = tiempoBloqueo; }
     public void setTiempoEjecucion(int tiempoEjecucion) { this.tiempoEjecucion = tiempoEjecucion; }
