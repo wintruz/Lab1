@@ -10,7 +10,8 @@ public class PCBP {
     protected int tiempoCola = 0;       // tiempo en cola de listos
     protected int tiempoEjecucion = 0;  // tiempo ejecutado
     protected int tiempoTotal = 0;      // tiempo total transcurrido
-    
+    protected boolean yaFueBloqueado = false;
+
     // Constructor
     public PCBP(int idProceso, int cantidadInstrucciones, boolean bloqueo, String estado, int tiempoBloqueo){
         this.idProceso = idProceso;
@@ -42,7 +43,7 @@ public class PCBP {
     public int getTiempoEjecucion() { return tiempoEjecucion; }
     public int getTiempoTotal() { return tiempoTotal; }
     public int getCambioContexto(){ return cambioContexto;}
-
+    public boolean getBloqueo(){ return bloqueo;}
     // Setters
     public void setEstado(String estado) { this.estado = estado; }
     public void setCambioContexto(int cantidad){
@@ -51,7 +52,15 @@ public class PCBP {
 	public void setCantidadInstrucciones(int cantidad){
 		this.cantidadInstrucciones = cantidad;
 	}
-    
+
+    public boolean isYaFueBloqueado() {
+    return yaFueBloqueado;
+    }
+
+    public void setYaFueBloqueado(boolean yaFueBloqueado) {
+        this.yaFueBloqueado = yaFueBloqueado;
+    }
+
     // El valor actual del objeto se le suma con el argumento, asegurase que 
     // su argumento sea una suma del valor actual y el valor agregado
     public void setTiempoCola(int tiempoCola) { this.tiempoCola = tiempoCola; }
