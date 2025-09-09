@@ -1,4 +1,7 @@
 import java.util.Random;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Comparator;
@@ -40,7 +43,7 @@ public class Main {
             bloqueo = random.nextBoolean();
             procesos = random.nextInt(100 - 5 + 1) + 5;
             tiempoBloqueo = bloqueo == true ? random.nextInt(8-2+1)+2: 0;
-			 System.out.printf("%-10s %-10d %-15d %-10s %-10d %-10s %-12s\n",
+			System.out.printf("%-10s %-10d %-15d %-10s %-10d %-10s %-12s\n",
                     "P" +(i+1),
                     (i+1),
                     procesos,
@@ -215,4 +218,31 @@ public class Main {
 		}
 		System.out.println("------------------------------------------------------------------------------------------------\n\n");
 	}
+
+
+	// Función para escribir la tabla de procesos en un archivo de texto
+    public static void escribirTablaEnArchivo(ArrayList<PCBP> listaAct, String nombreArchivo) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo, false))) {
+            
+            bw.write(String.format("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
+                    "ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time"));
+            bw.write("------------------------------------------------------------------------------------------------\n");
+
+            for (PCBP p : listaAct) {
+                bw.write(String.format("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+                        "P" + p.getId(),
+                        p.getCantidadInstrucciones(),
+                        p.getEstado(),
+                        p.getTiempoCola(),
+                        p.getCambioContexto(),
+                        "0", // aquí podrías cambiar si implementas Bloqueo real
+                        p.getTiempoEjecucion(),
+                        p.getTiempoTotal()));
+            }
+            bw.write("------------------------------------------------------------------------------------------------\n\n");
+
+        } catch (IOException e) {
+            System.out.println("Error al escribir en el archivo: " + e.getMessage());
+        }
+    }
 }
