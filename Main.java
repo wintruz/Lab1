@@ -148,6 +148,7 @@ public class Main {
 					salidaPCB(listapcb);
 					sc.nextLine();
 
+					listaTerminadospcb.add(procesoActual);
 					listapcb.remove(procesoActual); // Removiendo proceso terminado de la lista
 				}
 
@@ -175,6 +176,23 @@ public class Main {
 
 				primeraIteracion = false; // Después de la primera iteración, ya no se entrara en este bloque
 			}
+
+			// Salida final de tiempos totales para cada proceso
+			System.out.printf("\n\n%-40s\n","Tiempos Totales");
+			System.out.printf("%-12s %-12s %-8s %-12s %-12s %-12s\n",
+							"ID-Proceso", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
+
+			System.out.println("------------------------------------------------------------------------------------------------");
+			for (PCBP p : listaTerminadospcb) {
+			System.out.printf("%-12s %-12d %-8d %-12s %-12d %-12d\n",
+					"P" + p.getId(),
+					p.getTiempoCola(),
+					p.getCambioContexto(),
+					p.getTiempoBloqueo(),
+					p.getTiempoEjecucion(),
+					p.getTiempoTotal());
+			}
+			System.out.println("------------------------------------------------------------------------------------------------\n\n");
 		}
     }
 
