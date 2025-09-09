@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Comparator;
+
 public class Main {
 	
     public static void main(String[] args) {
@@ -13,7 +14,7 @@ public class Main {
         int quantum = random.nextInt(100 - 10 + 1) + 10;
         int num_procesos = random.nextInt(10) + 1;
         boolean bloqueo;
-        int tiempoGlobal = 0;
+        int tiempoTotalCDC = 0;
 		int cInsProceso;
 		boolean primeraIteracion = true;
         PCBP procesoActual = null;
@@ -54,26 +55,8 @@ public class Main {
 			p.setEstado("L");
 		}
 
-		// Inicio de impresion de tabla para mostrar procesos listos
-		System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-                "ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-		System.out.println("------------------------------------------------------------------------------------------------");
-
-        for (PCBP p : listapcb) {
-            System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-                    "P" + p.getId(),
-                    p.getCantidadInstrucciones(),
-                    p.getEstado(),
-                    p.getTiempoCola(),
-                    p.getCambioContexto(),
-                    "0",
-                    p.getTiempoEjecucion(),
-                    p.getTiempoTotal());
-        }
-		System.out.println("------------------------------------------------------------------------------------------------\n\n");
-		// Fin de impresion de tabla para mostrar procesos listos
-
-		// int cont = 0; // Por ahora no se utiliza
+		// Impresion de tabla para mostrar procesos listos
+		salidaPCB(listapcb);
 
 		// Inicio del ciclo de vida de los procesos
         while(!listapcb.isEmpty()){
@@ -90,6 +73,7 @@ public class Main {
 					procesoActual.setEstado("E");
 					procesoActual.setCambioContexto(cdc);
 					procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + 1);
+					tiempoTotalCDC++;
 
 					// Actualizar valores de tiempo de cola y total para los demas procesos
 					for (PCBP p: listapcb) {
@@ -100,24 +84,10 @@ public class Main {
 					}
 
 					// Inicio de salida de tabla cambio de contexto
-					System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-						"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-					
-					System.out.println("------------------------------------------------------------------------------------------------");
-					for (PCBP p : listapcb) {
-					System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-							"P" + p.getId(),
-							p.getCantidadInstrucciones(),
-							p.getEstado(),
-							p.getTiempoCola(),
-							p.getCambioContexto(),
-							"0",
- 							p.getTiempoEjecucion(),
-							p.getTiempoTotal());
-					}
-					System.out.println("------------------------------------------------------------------------------------------------\n\n");
-					// Fin de salida de tabla cambio de contexto (Proceso en ejecucion)
+					salidaPCB(listapcb);
 				}
+
+				// Implementar condicional para bloqueo
 
 				// Actualizar valores del proceso actual
 
@@ -159,47 +129,15 @@ public class Main {
 					procesoActual.setCantidadInstrucciones(0);
 				}
 
-				// Inicio de salida de tabla (Proceso en ejecucion)
-				System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-					"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-				
-				System.out.println("------------------------------------------------------------------------------------------------");
-				for (PCBP p : listapcb) {
-				System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-						"P" + p.getId(),
-						p.getCantidadInstrucciones(),
-						p.getEstado(),
-						p.getTiempoCola(),
-						p.getCambioContexto(),
-						"0",
-						p.getTiempoEjecucion(),
-						p.getTiempoTotal());
-				}
-				System.out.println("------------------------------------------------------------------------------------------------\n\n");
-				// Fin de salida de tabla (Proceso en ejecucion)
+				// Salida de tabla (Proceso en ejecucion)
+				salidaPCB(listapcb);
 
 				// Si el proceso terminó
 				if (procesoActual.getCantidadInstrucciones() == 0) {
 					procesoActual.setEstado("T");
 
 					// Inicio de salida de tabla (Proceso terminado)
-					System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-						"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-					
-					System.out.println("------------------------------------------------------------------------------------------------");
-					for (PCBP p : listapcb) {
-					System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-							"P" + p.getId(),
-							p.getCantidadInstrucciones(),
-							p.getEstado(),
-							p.getTiempoCola(),
-							p.getCambioContexto(),
-							"0",
-							p.getTiempoEjecucion(),
-							p.getTiempoTotal());
-					}
-					System.out.println("------------------------------------------------------------------------------------------------\n\n");
-					// Fin de salida de tabla (Proceso terminado)
+					salidaPCB(listapcb);
 
 					listapcb.remove(procesoActual); // Removiendo proceso terminado de la lista
 				}
@@ -223,28 +161,32 @@ public class Main {
 				}
 
 				// Inicio impresion de organizacion de procesos
-				System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-						"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-
-				System.out.println("------------------------------------------------------------------------------------------------");
-				for (PCBP p : listapcb) {
-				System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-						"P" + p.getId(),
-						p.getCantidadInstrucciones(),
-						p.getEstado(),
-						p.getTiempoCola(),
-						p.getCambioContexto(),
-						"0",
-						p.getTiempoEjecucion(),
-						p.getTiempoTotal());
-				}
-				System.out.println("------------------------------------------------------------------------------------------------\n\n");
-				// Fin impresion de organizacion de procesos
+				salidaPCB(listapcb);
 
 				primeraIteracion = false; // Después de la primera iteración, ya no se entrara en este bloque
 			}
 		}
     }
+
+	// Metodo para salida de la tabla
+	public static void salidaPCB(ArrayList<PCBP>listaAct){
+	System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
+						"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
+
+	System.out.println("------------------------------------------------------------------------------------------------");
+	for (PCBP p : listaAct) {
+	System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+			"P" + p.getId(),
+			p.getCantidadInstrucciones(),
+			p.getEstado(),
+			p.getTiempoCola(),
+			p.getCambioContexto(),
+			"0",
+			p.getTiempoEjecucion(),
+			p.getTiempoTotal());
+	}
+	System.out.println("------------------------------------------------------------------------------------------------\n\n");
+}
 }
 
 
