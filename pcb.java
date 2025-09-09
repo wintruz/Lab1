@@ -21,21 +21,37 @@ public class pcb {
     }
 
 
-    public pcb(int i){
-        this.id_PCB = "P" + i;
-
+    public pcb(String id, int cInstr, boolean bloq, int tCola, int tCDC, int tBloq, int tEjec){
+        this.id_PCB = id;
+        this.cant_Instruc = cInstr;
+        this.estado = 'N'; // Unico atributo que se le asigna un valor por defecto
+        this.bloqueo = bloq;
+        this.tiempo_Cola = tCola;
+        this.tiempo_CDC = tCDC;
+        this.tiempo_Bloqueo = tBloq;
+        this.tiempo_Ejecutado = tEjec;
     }
 
     // Metodos
 
     // Metodos para impresion en pantalla
+
+    //Impresion de tabla al entrar en el ciclo de ejecucion de los procesos
     public void tabla_PCB_itr(ArrayList<pcb> procesos){
-        String fila = String.format();
+        //Impresion de encabezado
+        System.out.printf("%-10s %-12s %-10s %-10s %-10s %-10s %-10s %-10s %s%n",
+                "ID-Proceso", "Cant. Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time", "");
+
         pcb temp = new pcb();
 
         for(int i = 0, n = procesos.size();i < n;i++){
-            temp = procesos.get(i);
-            fila = temp.get_idPCB() + temp.get_cInstruc() + temp.get_estado() + temp.get_tCDC() + temp.get_tBloqueo() + temp.get_tEjecutado();
+            temp = procesos.get(i); // Obtencion del i elemento de la lista
+
+            // Inicio impresion fila del proceso i
+            System.out.printf("%-10s %-12d %-10s %-10d %-10d %-10d %-10d %-10d %s%n",
+            temp.get_idPCB() + temp.get_cInstruc() + temp.get_estado() + temp.get_tCDC() + 
+            temp.get_tBloqueo() + temp.get_tEjecutado());
+            // Fin de impresion fila de proceso i
         }
     }
 
