@@ -1,7 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.Scanner;
 import java.util.Comparator;
 
 public class Main {
@@ -9,18 +8,24 @@ public class Main {
     public static void main(String[] args) {
 
         Random random = new Random();
+		Scanner sc = new Scanner(System.in);
         int cdc = 1, procesos,tiempoBloqueo;
         //Queue<PCBP> listaPcbs = new PriorityQueue<>();
         int quantum = random.nextInt(100 - 10 + 1) + 10;
-        int num_procesos = random.nextInt(10) + 1;
+
+        int num_procesos = 0;
         boolean bloqueo;
         int tiempoTotalCDC = 0;
 		int cInsProceso;
 		boolean primeraIteracion = true;
         PCBP procesoActual = null;
+
+
+		System.out.println("Ingrese la cantidad de procesos: ");
+		num_procesos = sc.nextInt();
         System.out.println("Quantum: "+ quantum +"ms");
         System.out.println("CDC inicial: "+cdc+"\n");
-        //System.out.println(num_procesos);
+
         ArrayList<PCBP> listapcb = new ArrayList<>();
 		ArrayList<PCBP> listaBloqueadospcb = new ArrayList<>();
 		ArrayList<PCBP> listaTerminadospcb = new ArrayList<>();
@@ -57,6 +62,7 @@ public class Main {
 
 		// Impresion de tabla para mostrar procesos listos
 		salidaPCB(listapcb);
+		sc.nextLine();
 
 		// Inicio del ciclo de vida de los procesos
         while(!listapcb.isEmpty()){
@@ -85,6 +91,7 @@ public class Main {
 
 					// Inicio de salida de tabla cambio de contexto
 					salidaPCB(listapcb);
+					sc.nextLine();
 				}
 
 				// Implementar condicional para bloqueo
@@ -131,6 +138,7 @@ public class Main {
 
 				// Salida de tabla (Proceso en ejecucion)
 				salidaPCB(listapcb);
+				sc.nextLine();
 
 				// Si el proceso terminó
 				if (procesoActual.getCantidadInstrucciones() == 0) {
@@ -138,6 +146,7 @@ public class Main {
 
 					// Inicio de salida de tabla (Proceso terminado)
 					salidaPCB(listapcb);
+					sc.nextLine();
 
 					listapcb.remove(procesoActual); // Removiendo proceso terminado de la lista
 				}
@@ -162,6 +171,7 @@ public class Main {
 
 				// Inicio impresion de organizacion de procesos
 				salidaPCB(listapcb);
+				sc.nextLine();
 
 				primeraIteracion = false; // Después de la primera iteración, ya no se entrara en este bloque
 			}
@@ -170,23 +180,23 @@ public class Main {
 
 	// Metodo para salida de la tabla
 	public static void salidaPCB(ArrayList<PCBP>listaAct){
-	System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
-						"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
+		System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
+							"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
 
-	System.out.println("------------------------------------------------------------------------------------------------");
-	for (PCBP p : listaAct) {
-	System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
-			"P" + p.getId(),
-			p.getCantidadInstrucciones(),
-			p.getEstado(),
-			p.getTiempoCola(),
-			p.getCambioContexto(),
-			"0",
-			p.getTiempoEjecucion(),
-			p.getTiempoTotal());
+		System.out.println("------------------------------------------------------------------------------------------------");
+		for (PCBP p : listaAct) {
+		System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+				"P" + p.getId(),
+				p.getCantidadInstrucciones(),
+				p.getEstado(),
+				p.getTiempoCola(),
+				p.getCambioContexto(),
+				"0",
+				p.getTiempoEjecucion(),
+				p.getTiempoTotal());
+		}
+		System.out.println("------------------------------------------------------------------------------------------------\n\n");
 	}
-	System.out.println("------------------------------------------------------------------------------------------------\n\n");
-}
 }
 
 
