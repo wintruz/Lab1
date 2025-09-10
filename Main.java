@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Comparator;
+import java.util.Iterator;
 
 public class Main {
 
@@ -13,7 +14,6 @@ public class Main {
 		Random random = new Random();
 		Scanner sc = new Scanner(System.in);
 		int cdc = 1, procesos, tiempoBloqueo;
-		// Queue<PCBP> listaPcbs = new PriorityQueue<>();
 		int quantum = random.nextInt(100 - 10 + 1) + 10;
 
 		int num_procesos = 0;
@@ -72,57 +72,142 @@ public class Main {
 
 			// Caso principal a evaluar de manera iterativa, siendo la iteracion > 1
 			if (!primeraIteracion) { // Evita cambiar de rama del if despues de la primera iteracion
-				// Fase 2: Ejecucion de proceso mas corto
-				// Utilizacion de objeto temporal para manejar el proceso mas corto
-				procesoActual = listapcb.get(0);
+				do {
+					// Fase 2: Ejecucion de proceso mas corto
+					// Utilizacion de objeto temporal para manejar el proceso mas corto
+					procesoActual = listapcb.get(0);
 
-				// Fase 2.5: Cambio de contexto
-				if (procesoActual.getEstado().equals("L")) {
-					// Actualizar valores del proceso actual
-					procesoActual.setEstado("E");
-					procesoActual.setCambioContexto(cdc);
-					procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + 1);
-					tiempoTotalCDC++;
+					// Fase 2.5: Cambio de contexto
+					if (procesoActual.getEstado().equals("L")) {
+						// Actualizar valores del proceso actual
+						procesoActual.setEstado("E");
+						procesoActual.setCambioContexto(procesoActual.getCambioContexto() + cdc);
+						procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + 1);
+						if(procesoActual.getBloqueo()){
+							procesoActual.setTiempoEjecucion(procesoActual.getTiempoEjecucion() + 1);
+						}
+						tiempoTotalCDC++;
 
-					// Actualizar valores de tiempo de cola y total para los demas procesos
-					for (PCBP p : listapcb) {
-						if (p.getEstado().equals("L")) {
-							p.setTiempoCola(p.getTiempoCola() + 1);
+						// Actualizar valores de tiempo de cola y total para los demas procesos
+						for (PCBP p : listapcb) {
+							if (p.getEstado().equals("L")) {
+								p.setTiempoCola(p.getTiempoCola() + 1);
+								p.setTiempoTotal(p.getTiempoTotal() + 1);
+							}
+						}
+
+						Iterator<PCBP> it = listaBloqueadospcb.iterator();
+						// Procesos bloqueados
+						while (it.hasNext()) {
+							PCBP p = it.next();
+							p.setTiempoBloqueo(p.getTiempoBloqueo() - 1);
+							p.setTiempoTotBloq(p.getTiempoTotBloq() + 1);
 							p.setTiempoTotal(p.getTiempoTotal() + 1);
+
+							if (p.getTiempoBloqueo() <= 0) {
+								p.setEstado("L");
+								p.setCambioContexto(p.getCambioContexto() + cdc);
+								listapcb.add(p);
+								it.remove(); // Usar el método remove() del iterador // Agregar salida por si se remueve
+							}
+						}
+
+						// Inicio de salida de tabla cambio de contexto
+						if(listaBloqueadospcb.size() == 0){
+							salidaPCB(listapcb);
+							sc.nextLine();
+						}else{
+							// Salida de procesos
+							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							sc.nextLine();
 						}
 					}
 
-					// Inicio de salida de tabla cambio de contexto
-					salidaPCB(listapcb);
-					sc.nextLine();
-				}
+					// Fase 3: Verificar opcion de bloqueo
+					if (procesoActual.getBloqueo() || listaBloqueadospcb.size() > 0) {
 
-				// Implementar condicional para bloqueo
-				if (procesoActual.getBloqueo() && !procesoActual.isYaFueBloqueado()) {
-					// Ejecuta solo 1ms
-					procesoActual.setCantidadInstrucciones(procesoActual.getCantidadInstrucciones() - 1);
-					procesoActual.setTiempoEjecucion(procesoActual.getTiempoEjecucion() + 1);
-					procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + 1);
+						// Si el proceso no ha sido bloqueado
+						if(!procesoActual.isYaFueBloqueado() && procesoActual.getBloqueo()){
+							// Ejecuta solo 1ms
+							procesoActual.setCantidadInstrucciones(procesoActual.getCantidadInstrucciones() - 1);
+							procesoActual.setCambioContexto(procesoActual.getCambioContexto() + cdc);
+							procesoActual.setTiempoTotal(procesoActual.getTiempoTotal() + 1);
 
-					// Cambiar a estado bloqueado
-					procesoActual.setEstado("B");
-					procesoActual.setYaFueBloqueado(true); // para que no vuelva a entrar aquí
-					listaBloqueadospcb.add(procesoActual);
-					listapcb.remove(procesoActual);
-					continue; // pasamos al siguiente proceso
-				}
+							Iterator<PCBP> it = listaBloqueadospcb.iterator();
+							// Procesos bloqueados
+							while (it.hasNext()) {
+								PCBP p = it.next();
+								p.setTiempoBloqueo(p.getTiempoBloqueo() - 1);
+								p.setTiempoTotBloq(p.getTiempoTotBloq() + 1);
+								p.setTiempoTotal(p.getTiempoTotal() + 1);
 
-				for (int i = 0; i < listaBloqueadospcb.size(); i++) {
-					PCBP p = listaBloqueadospcb.get(i);
-					p.setTiempoBloqueo(p.getTiempoBloqueo() - 1);
+								if (p.getTiempoBloqueo() <= 0) {
+									p.setEstado("L");
+									p.setCambioContexto(p.getCambioContexto() + cdc);
+									listapcb.add(p);
+									it.remove(); // Usar el método remove() del iterador
+								}
+							}
 
-					if (p.getTiempoBloqueo() <= 0) {
-						p.setEstado("L");
-						listapcb.add(p);
-						listaBloqueadospcb.remove(p);
-						i--; // porque removimos
+							// Cambiar a estado bloqueado
+							procesoActual.setEstado("B");
+							procesoActual.setYaFueBloqueado(true); // para que no vuelva a entrar aquí
+							listaBloqueadospcb.add(procesoActual);
+							listapcb.remove(procesoActual);
+
+							// Demas procesos
+							for (PCBP p1 : listapcb) {
+								if(p1.getEstado().equals("L")){ // Solo para los procesos Listos
+									p1.setTiempoCola(p1.getTiempoCola() + 1);
+								}else if(p1.getEstado().equals("E")){ // Solo para el proceso en ejecucion
+									p1.setTiempoEjecucion(p1.getTiempoEjecucion() + 1);
+								}
+								p1.setTiempoTotal(p1.getTiempoTotal() + 1);
+							}
+
+							// Salida de procesos
+							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							sc.nextLine();
+						}else {
+							// Actualizar valores
+
+							Iterator<PCBP> it = listaBloqueadospcb.iterator();
+							// Procesos bloqueados
+							while (it.hasNext()) {
+								PCBP p = it.next();
+								p.setTiempoBloqueo(p.getTiempoBloqueo() - 1);
+								p.setTiempoTotBloq(p.getTiempoTotBloq() + 1);
+								p.setTiempoTotal(p.getTiempoTotal() + 1);
+
+								if (p.getTiempoBloqueo() <= 0) {
+									p.setEstado("L");
+									p.setCambioContexto(p.getCambioContexto() + cdc);
+									listapcb.add(p);
+									it.remove(); // Usar el método remove() del iterador // Agregar salida por si se remueve
+								}
+							}
+
+							// Demas procesos
+							for (PCBP p1 : listapcb) {
+								if(p1.getEstado().equals("L") && !p1.isYaFueBloqueado()){ // Solo para los procesos Listos
+									p1.setTiempoCola(p1.getTiempoCola() + 1);
+								}else if(p1.getEstado().equals("E")){ // Solo para el proceso en ejecucion
+									p1.setTiempoEjecucion(p1.getTiempoEjecucion() + 1);
+								}
+								p1.setTiempoTotal(p1.getTiempoTotal() + 1);
+							}
+
+							// Agregar salida antes de actualizar valores
+
+							// Reordear lista de procesos sin bloquear antes de salida
+							listapcb.sort(Comparator.comparingInt(PCBP::getCantidadInstrucciones));
+
+							// Salida de procesos
+							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							sc.nextLine();
+						}
 					}
-				}
+				}while(listaBloqueadospcb.size() > 0); // Mientras aun haya procesos bloqueados
 
 				// Actualizar valores del proceso actual
 
@@ -206,29 +291,30 @@ public class Main {
 
 				primeraIteracion = false; // Después de la primera iteración, ya no se entrara en este bloque
 			}
-
-			// Salida final de tiempos totales para cada proceso
-			System.out.printf("\n\n%-40s\n", "Tiempos Totales");
-			System.out.printf("%-12s %-12s %-8s %-12s %-12s %-12s\n",
-					"ID-Proceso", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
-
-			System.out.println(
-					"------------------------------------------------------------------------------------------------");
-			for (PCBP p : listaTerminadospcb) {
-				System.out.printf("%-12s %-12d %-8d %-12s %-12d %-12d\n",
-						"P" + p.getId(),
-						p.getTiempoCola(),
-						p.getCambioContexto(),
-						p.getTiempoBloqueo(),
-						p.getTiempoEjecucion(),
-						p.getTiempoTotal());
-			}
-			System.out.println(
-					"------------------------------------------------------------------------------------------------\n\n");
 		}
+		// Salida final de tiempos totales para cada proceso
+		System.out.printf("\n\n%-40s\n", "Tiempos Totales");
+		System.out.printf("%-12s %-12s %-8s %-12s %-12s %-12s\n",
+				"ID-Proceso", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
+
+		System.out.println(
+				"------------------------------------------------------------------------------------------------");
+		for (PCBP p : listaTerminadospcb) {
+			System.out.printf("%-12s %-12d %-8d %-12s %-12d %-12d\n",
+					"P" + p.getId(),
+					p.getTiempoCola(),
+					p.getCambioContexto(),
+					p.getTiempoTotBloq(),
+					p.getTiempoEjecucion(),
+					p.getTiempoTotal());
+		}
+		System.out.println(
+				"------------------------------------------------------------------------------------------------\n\n");
 	}
 
-	// Metodo para salida de la tabla
+	// Metodos para salida de la tabla 
+	
+	// Al no haber procesos bloqueados
 	public static void salidaPCB(ArrayList<PCBP> listaAct) {
 		System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
 				"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
@@ -242,7 +328,43 @@ public class Main {
 					p.getEstado(),
 					p.getTiempoCola(),
 					p.getCambioContexto(),
-					"0",
+					p.getTiempoTotBloq(),
+					p.getTiempoEjecucion(),
+					p.getTiempoTotal());
+		}
+		System.out.println(
+				"------------------------------------------------------------------------------------------------\n\n");
+	}
+
+	// Al tener procesos bloqueados
+	public static void salidaPCBbloq(ArrayList<PCBP> listaAct, ArrayList<PCBP> listBloqAct) {
+		System.out.printf("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
+				"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time");
+
+		System.out.println(
+				"------------------------------------------------------------------------------------------------");
+		// Procesos bloqueados
+		for (PCBP p : listBloqAct) {
+			System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+					"P" + p.getId(),
+					p.getCantidadInstrucciones(),
+					p.getEstado(),
+					p.getTiempoCola(),
+					p.getCambioContexto(),
+					p.getTiempoTotBloq(),
+					p.getTiempoEjecucion(),
+					p.getTiempoTotal());
+		}
+
+		// Demas procesos
+		for (PCBP p : listaAct) {
+			System.out.printf("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+					"P" + p.getId(),
+					p.getCantidadInstrucciones(),
+					p.getEstado(),
+					p.getTiempoCola(),
+					p.getCambioContexto(),
+					p.getTiempoTotBloq(),
 					p.getTiempoEjecucion(),
 					p.getTiempoTotal());
 		}

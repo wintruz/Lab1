@@ -7,6 +7,7 @@ public class PCBP {
     protected String estado; // L, E, B, T
     protected int cambioContexto = 0;
     protected int tiempoBloqueo = 0;    // ciclos de bloqueo
+    protected int tBloqueoTot = 0;
     protected int tiempoCola = 0;       // tiempo en cola de listos
     protected int tiempoEjecucion = 0;  // tiempo ejecutado
     protected int tiempoTotal = 0;      // tiempo total transcurrido
@@ -40,14 +41,16 @@ public class PCBP {
     public String getEstado() { return estado; }
     public int getTiempoCola() { return tiempoCola; }
     public int getTiempoBloqueo() { return tiempoBloqueo; }
+    public int getTiempoTotBloq() { return tBloqueoTot; }
     public int getTiempoEjecucion() { return tiempoEjecucion; }
     public int getTiempoTotal() { return tiempoTotal; }
     public int getCambioContexto(){ return cambioContexto;}
     public boolean getBloqueo(){ return bloqueo;}
     // Setters
     public void setEstado(String estado) { this.estado = estado; }
+
     public void setCambioContexto(int cantidad){
-        this.cambioContexto += cantidad;
+        this.cambioContexto = cantidad;
     }
 	public void setCantidadInstrucciones(int cantidad){
 		this.cantidadInstrucciones = cantidad;
@@ -65,6 +68,7 @@ public class PCBP {
     // su argumento sea una suma del valor actual y el valor agregado
     public void setTiempoCola(int tiempoCola) { this.tiempoCola = tiempoCola; }
     public void setTiempoBloqueo(int tiempoBloqueo) { this.tiempoBloqueo = tiempoBloqueo; }
+    public void setTiempoTotBloq(int tTotBloq) { this.tBloqueoTot = tTotBloq; }
     public void setTiempoEjecucion(int tiempoEjecucion) { this.tiempoEjecucion = tiempoEjecucion; }
     public void setTiempoTotal(int tiempoTotal) { this.tiempoTotal = tiempoTotal; }
 }
