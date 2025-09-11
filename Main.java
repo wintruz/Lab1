@@ -22,9 +22,13 @@ public class Main {
 		int cInsProceso;
 		boolean primeraIteracion = true;
 		PCBP procesoActual = null;
+		String nombreArchivo = "procesos_pcb.txt";
 
-		System.out.println("Ingrese la cantidad de procesos: ");
-		num_procesos = sc.nextInt();
+		//System.out.println("Ingrese la cantidad de procesos: ");
+		num_procesos = 4
+		
+		
+		;//sc.nextInt();
 		System.out.println("Quantum: " + quantum + "ms");
 		System.out.println("CDC inicial: " + cdc + "\n");
 
@@ -56,7 +60,7 @@ public class Main {
 		}
 		System.out.println(
 				"------------------------------------------------------------------------------------------------\n\n");
-
+		escribirTablaEnArchivo(listapcb,nombreArchivo);
 		// Impresion inicial de los procesos
 		// Fase 0: Alistar procesos dentro del ciclo de vida
 		for (PCBP p : listapcb) {
@@ -65,6 +69,7 @@ public class Main {
 
 		// Impresion de tabla para mostrar procesos listos
 		salidaPCB(listapcb);
+		escribirTablaEnArchivo(listapcb,nombreArchivo);
 		sc.nextLine();
 
 		// Inicio del ciclo de vida de los procesos
@@ -75,7 +80,11 @@ public class Main {
 				do {
 					// Fase 2: Ejecucion de proceso mas corto
 					// Utilizacion de objeto temporal para manejar el proceso mas corto
-					procesoActual = listapcb.get(0);
+					// verificacion de elementos en listas 
+					if(!listapcb.isEmpty()){
+						procesoActual = listapcb.get(0);
+					}
+					
 
 					// Fase 2.5: Cambio de contexto
 					if (procesoActual.getEstado().equals("L")) {
@@ -115,10 +124,12 @@ public class Main {
 						// Inicio de salida de tabla cambio de contexto
 						if(listaBloqueadospcb.size() == 0){
 							salidaPCB(listapcb);
+							escribirTablaEnArchivo(listapcb,nombreArchivo);
 							sc.nextLine();
 						}else{
 							// Salida de procesos
 							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							escribirTablaEnArchivo(listapcb,listaBloqueadospcb,nombreArchivo);
 							sc.nextLine();
 						}
 					}
@@ -167,6 +178,7 @@ public class Main {
 
 							// Salida de procesos
 							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							escribirTablaEnArchivo(listapcb,listaBloqueadospcb,nombreArchivo);
 							sc.nextLine();
 						}else {
 							// Actualizar valores
@@ -204,6 +216,7 @@ public class Main {
 
 							// Salida de procesos
 							salidaPCBbloq(listapcb, listaBloqueadospcb);
+							escribirTablaEnArchivo(listapcb,listaBloqueadospcb,nombreArchivo);
 							sc.nextLine();
 						}
 					}
@@ -252,6 +265,7 @@ public class Main {
 
 				// Salida de tabla (Proceso en ejecucion)
 				salidaPCB(listapcb);
+				escribirTablaEnArchivo(listapcb,nombreArchivo);
 				sc.nextLine();
 
 				// Si el proceso terminó
@@ -260,6 +274,7 @@ public class Main {
 
 					// Inicio de salida de tabla (Proceso terminado)
 					salidaPCB(listapcb);
+					escribirTablaEnArchivo(listapcb,nombreArchivo);
 					sc.nextLine();
 
 					listaTerminadospcb.add(procesoActual);
@@ -287,6 +302,7 @@ public class Main {
 
 				// Inicio impresion de organizacion de procesos
 				salidaPCB(listapcb);
+				escribirTablaEnArchivo(listapcb,nombreArchivo);
 				sc.nextLine();
 
 				primeraIteracion = false; // Después de la primera iteración, ya no se entrara en este bloque
@@ -310,6 +326,7 @@ public class Main {
 		}
 		System.out.println(
 				"------------------------------------------------------------------------------------------------\n\n");
+		escribirTiemposTotales(listaTerminadospcb,nombreArchivo);
 	}
 
 	// Metodos para salida de la tabla 
@@ -374,7 +391,7 @@ public class Main {
 
 	// Función para escribir la tabla de procesos en un archivo de texto
 	public static void escribirTablaEnArchivo(ArrayList<PCBP> listaAct, String nombreArchivo) {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo, false))) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo,true))) {
 
 			bw.write(String.format("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
 					"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time"));
@@ -399,4 +416,68 @@ public class Main {
 			System.out.println("Error al escribir en el archivo: " + e.getMessage());
 		}
 	}
+
+	public static void escribirTablaEnArchivo(ArrayList<PCBP> listaAct,ArrayList<PCBP> listaBloqueadospcb, String nombreArchivo) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo,true))) {
+
+			bw.write(String.format("%-12s %-15s %-8s %-12s %-8s %-12s %-12s %-12s\n",
+					"ID-Proceso", "Cant.Inst.", "Estado", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time"));
+			bw.write(
+					"------------------------------------------------------------------------------------------------\n");
+
+			for (PCBP p : listaAct) {
+				bw.write(String.format("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+						"P" + p.getId(),
+						p.getCantidadInstrucciones(),
+						p.getEstado(),
+						p.getTiempoCola(),
+						p.getCambioContexto(),
+						p.getTiempoBloqueo(), // aquí podrías cambiar si implementas Bloqueo real
+						p.getTiempoEjecucion(),
+						p.getTiempoTotal()));
+			}
+
+
+			for (PCBP p : listaBloqueadospcb) {
+				bw.write(String.format("%-12s %-15d %-8s %-12d %-8d %-12s %-12d %-12d\n",
+						"P" + p.getId(),
+						p.getCantidadInstrucciones(),
+						p.getEstado(),
+						p.getTiempoCola(),
+						p.getCambioContexto(),
+						p.getTiempoBloqueo(), // aquí podrías cambiar si implementas Bloqueo real
+						p.getTiempoEjecucion(),
+						p.getTiempoTotal()));
+			}
+			bw.write(
+					"------------------------------------------------------------------------------------------------\n\n");
+
+		} catch (IOException e) {
+			System.out.println("Error al escribir en el archivo: " + e.getMessage());
+		}
+	}
+	
+	public static void escribirTiemposTotales(ArrayList<PCBP> listaTerminados, String nombreArchivo) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo, true))) {
+        bw.write("\n\nTiempos Totales\n");
+        bw.write(String.format("%-12s %-12s %-8s %-12s %-12s %-12s\n",
+                "ID-Proceso", "Time Cola", "CDC", "Bloqueo", "Time Exe", "Total Time"));
+        bw.write("------------------------------------------------------------------------------------------------\n");
+
+        for (PCBP p : listaTerminados) {
+            bw.write(String.format("%-12s %-12d %-8d %-12s %-12d %-12d\n",
+                    "P" + p.getId(),
+                    p.getTiempoCola(),
+                    p.getCambioContexto(),
+                    p.getTiempoTotBloq(),
+                    p.getTiempoEjecucion(),
+                    p.getTiempoTotal()));
+        }
+        bw.write("------------------------------------------------------------------------------------------------\n\n");
+
+    } catch (IOException e) {
+        System.out.println("Error al escribir tiempos totales en el archivo: " + e.getMessage());
+    }
+}
+
 }
